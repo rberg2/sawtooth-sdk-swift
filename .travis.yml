@@ -1,0 +1,12 @@
+language: swift
+osx_image: xcode11
+script:
+    - pip3 install sphinx sphinxcontrib-httpdomain sphinxcontrib-openapi sphinx_rtd_theme
+    - brew install sourcekitten
+    - gem install jazzy
+    - mkdir -p docs/build/html
+    - cd docs && sphinx-build -b html source build/html && cd ..
+    - swift build
+    - sourcekitten doc --spm-module SawtoothSigning > tmp.json
+    - jazzy --clean --sourcekitten-sourcefile tmp.json -o docs/build/html/jazzy_docs
+    - rm tmp.json
