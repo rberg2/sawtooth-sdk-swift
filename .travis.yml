@@ -10,3 +10,15 @@ script:
     - sourcekitten doc --spm-module SawtoothSigning > tmp.json
     - jazzy --clean --sourcekitten-sourcefile tmp.json -o docs/build/html/jazzy_docs
     - rm tmp.json
+    - tar -cpvzf docs-build.tar.gz docs/build/
+deploy:
+    - provider: releases
+      name: sawtooth-sdk-swift daily build
+      body: "$(TZ=America/Chicago date) $TRAVIS_COMMIT"
+      prerelease: true
+      overwrite: true
+      api_key: $API_SECRET
+      file:
+      - "./docs-build.tar.gz"
+      skip_cleanup: true
+      draft: true
