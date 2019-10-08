@@ -1,0 +1,24 @@
+language: swift
+osx_image: xcode11
+script:
+    - pip3 install sphinx sphinxcontrib-httpdomain sphinxcontrib-openapi sphinx_rtd_theme
+    - brew install sourcekitten
+    - gem install jazzy
+    - mkdir -p docs/build/html
+    - cd docs && sphinx-build -b html source build/html && cd ..
+    - swift build
+    - sourcekitten doc --spm-module SawtoothSigning > tmp.json
+    - jazzy --clean --sourcekitten-sourcefile tmp.json -o docs/build/html/jazzy_docs
+    - rm tmp.json
+    - tar -cpvzf docs-build.tar.gz docs/build/
+deploy:
+    - provider: releases
+      name: sawtooth-sdk-swift daily build
+      body: "$(TZ=America/Chicago date) $TRAVIS_COMMIT"
+      prerelease: true
+      overwrite: true
+      api_key: $API_SECRET
+      file:
+      - "./docs-build.tar.gz"
+      skip_cleanup: true
+      draft: true
