@@ -27,7 +27,7 @@ jobs:
           acl: public_read
 
   - stage: Release Build
-    if: type = tag
+    if: tag IS present
     script:
         - pip3 install sphinx sphinxcontrib-httpdomain sphinxcontrib-openapi sphinx_rtd_theme
         - brew install sourcekitten
@@ -51,6 +51,7 @@ jobs:
           acl: public_read
 
   - stage: Default Build
+    if: tag IS blank AND NOT type = cron
     script:
         - pip3 install sphinx sphinxcontrib-httpdomain sphinxcontrib-openapi sphinx_rtd_theme
         - brew install sourcekitten
