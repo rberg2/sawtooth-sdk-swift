@@ -6,7 +6,7 @@ jobs:
     if: type = cron
     script:
         - pip3 install sphinx sphinxcontrib-httpdomain sphinxcontrib-openapi sphinx_rtd_theme
-        - HOMEBREW_NO_INSTALL_CLEANUP=TRUE; brew install sourcekitten
+        - brew install sourcekitten
         - gem install jazzy
         - mkdir -p docs/build/html docs/build/tar
         - cd docs && sphinx-build -b html source build/html && cd ..
@@ -14,7 +14,7 @@ jobs:
         - sourcekitten doc --spm-module SawtoothSigning > tmp.json
         - jazzy --clean --sourcekitten-sourcefile tmp.json -o docs/build/html/jazzy_docs
         - rm tmp.json
-        - tar -cpvzf docs/build/tar/sawtooth-sdk-swift-docs-nightly-$(TZ=America/Chicago date +%F).tar.gz docs/build/html
+        - tar -cpvzf docs/build/tar/sawtooth-sdk-swift-docs-nightly.tar.gz docs/build/html
     deploy:
         - provider: s3
           name: sawtooth-sdk-swift daily build
@@ -27,10 +27,10 @@ jobs:
           acl: public_read
 
   - stage: Release Build
-    if: tag IS present
+    if: type = tag
     script:
         - pip3 install sphinx sphinxcontrib-httpdomain sphinxcontrib-openapi sphinx_rtd_theme
-        - HOMEBREW_NO_INSTALL_CLEANUP=TRUE; brew install sourcekitten
+        - brew install sourcekitten
         - gem install jazzy
         - mkdir -p docs/build/html docs/build/tar
         - cd docs && sphinx-build -b html source build/html && cd ..
@@ -49,3 +49,16 @@ jobs:
           local_dir: docs/build/tar
           skip_cleanup: true
           acl: public_read
+
+  - stage: Default Build
+    script:
+        - pip3 install sphinx sphinxcontrib-httpdomain sphinxcontrib-openapi sphinx_rtd_theme
+        - brew install sourcekitten
+        - gem install jazzy
+        - mkdir -p docs/build/html docs/build/tar
+        - cd docs && sphinx-build -b html source build/html && cd ..
+        - swift build
+        - sourcekitten doc --spm-module SawtoothSigning > tmp.json
+        - jazzy --clean --sourcekitten-sourcefile tmp.json -o docs/build/html/jazzy_docs
+        - rm tmp.json
+        - tar -cpvzf docs/build/tar/sawtooth-sdk-swift-docs.tar.gz docs/build/html
