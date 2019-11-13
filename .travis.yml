@@ -49,6 +49,8 @@ jobs:
           local_dir: docs/build/tar
           skip_cleanup: true
           acl: public_read
+          on:
+            all_branches: true
 
   - stage: Default Build
     if: tag IS blank AND NOT type = cron
